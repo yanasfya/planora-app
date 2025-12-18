@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(dir /S /B *.ts *.tsx *.js *.jsx 2)",
+      "Bash(nul)",
+      "Bash(findstr:*)",
+      "Bash(dir /S /B /AD 2)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(curl:*)",
+      "Bash(for i in {1..5})",
+      "Bash(do echo \"Request $i: Paris medium budget\")",
+      "Bash(done)",
+      "Bash(for i in {2..10})",
+      "Bash(do curl -s \"http://localhost:3001/api/hotels?destination=Paris&budget=low\" -I)",
+      "Bash(python:*)",
+      "Bash(timeout /t 3)",
+      "Bash(do curl -s \"http://localhost:3001/api/hotels?destination=Jakarta&budget=medium&dates=2025-11-21,2025-11-23\")",
+      "Bash(break)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: implement Bento Grid UI with multi-currency hotel system\n\nMajor Features Added:\n- Bento Grid layout for itinerary pages with responsive cards\n- Complete multi-currency system with 10 supported currencies\n- Smart hotel recommendations with zero API costs\n- Real-time weather widget with OpenWeatherMap integration\n- Interactive map widget for destinations\n\nComponents:\n- BentoGrid: Responsive masonry layout container\n- DayCard: Daily itinerary activities display\n- WeatherWidget: 5-day forecast with travel tips\n- HotelWidget: Smart hotel recommendations with live pricing\n- MapWidget: Embedded Google Maps integration\n- CurrencySelector: Dropdown for currency switching\n\nCurrency System:\n- Auto-detection from destination (Jakarta→IDR, Paris→EUR, etc.)\n- Manual override via dropdown selector\n- Global preferences page (/settings)\n- Local storage persistence\n- Smart price formatting (IDR/JPY: no decimals, EUR/USD: 2 decimals)\n- 3-tier priority: Page > Global > Auto-detect\n\nHotel API Enhancements:\n- City-specific realistic pricing for 11 major cities\n- Authentic hotel chain names (Novotel, Mercure, etc.)\n- Real Unsplash hotel images\n- Date-aware Booking.com URLs with price filters\n- 30-minute caching with currency-aware cache keys\n- Multi-currency price conversion\n\nWeather API:\n- Fallback coordinates for 10 major cities\n- 5-day forecast with precipitation data\n- Context-aware travel tips\n- Comprehensive error logging\n\nTechnical Updates:\n- Added @/* path alias to tsconfig.json\n- Created lib/currency.ts utility module\n- Added CurrencyContext for app-wide state\n- Enhanced Hotel interface with priceUSD field\n- Updated .env.example with OPENWEATHER_API_KEY\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(mkdir:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(taskkill /PID 20600 /F)",
+      "Bash(cmd /c \"taskkill /PID 13120 /F & taskkill /PID 20600 /F & taskkill /PID 26060 /F\")",
+      "Bash(cmd /c \"for /f \"\"tokens=5\"\" %a in (''netstat -ano ^| findstr :3000 ^| findstr LISTENING'') do taskkill /PID %a /F\")",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(cat:*)",
+      "Bash(cd:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
