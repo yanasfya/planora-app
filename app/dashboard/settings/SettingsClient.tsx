@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { User, Bell, Globe, Palette } from "lucide-react";
 import { useTheme } from "@/app/contexts/ThemeContext";
+import { CURRENCIES } from "@/lib/currency";
 
 interface SettingsClientProps {
   userName: string;
@@ -156,12 +157,11 @@ export default function SettingsClient({
                   onChange={(e) => setCurrency(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="USD">USD - US Dollar</option>
-                  <option value="EUR">EUR - Euro</option>
-                  <option value="GBP">GBP - British Pound</option>
-                  <option value="MYR">MYR - Malaysian Ringgit</option>
-                  <option value="JPY">JPY - Japanese Yen</option>
-                  <option value="SGD">SGD - Singapore Dollar</option>
+                  {Object.entries(CURRENCIES).map(([code, curr]) => (
+                    <option key={code} value={code}>
+                      {code} - {curr.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
