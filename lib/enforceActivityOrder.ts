@@ -129,9 +129,10 @@ function adjustLastDayTiming(activities: Activity[]): Activity[] {
 
   console.log(`[Activity Order] Set departure time to ${minutesToTime(departureTime)}`);
 
-  // If checkout exists, set it 2-3 hours before departure
+  // If checkout exists, set it 4 hours before departure (14:00)
+  // This allows: Checkout (14:00) → Dinner (16:30) → Airport (18:00)
   if (checkoutIndex >= 0 && checkoutIndex !== departureIndex) {
-    const checkoutTimeValue = departureTime - 180; // 3 hours before departure (15:00)
+    const checkoutTimeValue = departureTime - 240; // 4 hours before departure (14:00)
     adjustedActivities[checkoutIndex] = {
       ...adjustedActivities[checkoutIndex],
       time: minutesToTime(checkoutTimeValue),
@@ -160,15 +161,16 @@ function adjustLastDayTiming(activities: Activity[]): Activity[] {
   }
 
   // Set meal times with proper spacing
-  // Breakfast: 08:00, Lunch: 12:30, Dinner: dynamically based on checkout
+  // Breakfast: 08:00, Lunch: 12:30, Dinner: AFTER checkout, before departure
+  // Correct order: Checkout (14:00) → Dinner (16:30) → Airport (18:00)
   const mealTimings: Record<string, number> = {
     breakfast: 480,  // 08:00
     lunch: 750,      // 12:30
-    dinner: Math.min(checkoutTime - 90, 1110), // 1.5 hours before checkout, max 18:30
+    dinner: departureTime - 90, // 16:30 - 1.5h before departure, AFTER checkout
   };
 
-  // If checkout is before 14:00, skip dinner entirely (too early)
-  const skipDinner = checkoutTime <= 840; // 14:00
+  // Skip dinner if departure is too early (before 17:00)
+  const skipDinner = departureTime <= 1020; // 17:00
 
   for (const {activity, index, mealType} of meals) {
     if (mealType === 'dinner' && skipDinner) {
