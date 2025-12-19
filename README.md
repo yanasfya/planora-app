@@ -77,7 +77,7 @@ Planora uses a hybrid AI architecture combining LLM creativity with systematic v
 1. **Transportation Enrichment** - Calculates optimal routes using Google Directions API
 2. **Meal Planning** - Strategically places breakfast, lunch, and dinner based on activity timing
 3. **Mosque Integration** - Adds nearby mosques Muslim travelers with proximity-based search
-4. **Activity Ordering** - Ensures logical flow with opening hours validation
+4. **Activity Ordering** - Ensures logical flow by time-based sorting
 
 ### Hybrid AI Approach
 - **Primary:** Google Gemini 2.5 Flash for creative itinerary generation
