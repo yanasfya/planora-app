@@ -38,11 +38,13 @@ export default function CurrencySelector({
             {autoDetectedCurrency} (Auto)
           </option>
         )}
-        {Object.entries(CURRENCIES).map(([code, curr]) => (
-          <option key={code} value={code}>
-            {curr.symbol} {curr.code}
-          </option>
-        ))}
+        {Object.entries(CURRENCIES)
+          .filter(([code]) => code !== autoDetectedCurrency)
+          .map(([code, curr]) => (
+            <option key={code} value={code}>
+              {curr.symbol} {curr.code}
+            </option>
+          ))}
       </select>
     </div>
   );
