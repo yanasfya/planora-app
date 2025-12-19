@@ -96,7 +96,15 @@ function isHotelCheckOut(activity: Activity): boolean {
 }
 
 /**
+ * Check if activity is a meal
+ */
+function isMealActivity(activity: Activity): boolean {
+  return activity.type === 'meal';
+}
+
+/**
  * Adjust Last Day timing to ensure logical flow
+ * Preserves proper meal spacing (breakfast 08:00, lunch 12:30, dinner before checkout)
  */
 function adjustLastDayTiming(activities: Activity[]): Activity[] {
   if (activities.length === 0) return activities;
@@ -123,56 +131,98 @@ function adjustLastDayTiming(activities: Activity[]): Activity[] {
 
   // If checkout exists, set it 2-3 hours before departure
   if (checkoutIndex >= 0 && checkoutIndex !== departureIndex) {
-    const checkoutTime = departureTime - 180; // 3 hours before departure (15:00)
+    const checkoutTimeValue = departureTime - 180; // 3 hours before departure (15:00)
     adjustedActivities[checkoutIndex] = {
       ...adjustedActivities[checkoutIndex],
-      time: minutesToTime(checkoutTime),
+      time: minutesToTime(checkoutTimeValue),
     };
-    console.log(`[Activity Order] Set checkout time to ${minutesToTime(checkoutTime)}`);
+    console.log(`[Activity Order] Set checkout time to ${minutesToTime(checkoutTimeValue)}`);
   }
-
-  // All activities (except departure and checkout) should be BEFORE checkout
-  const beforeCheckout: Array<{activity: Activity, index: number}> = [];
 
   const checkoutTime = checkoutIndex >= 0
     ? timeToMinutes(adjustedActivities[checkoutIndex].time)
     : departureTime;
 
+  // Separate meals from other activities
+  const meals: Array<{activity: Activity, index: number, mealType: string}> = [];
+  const nonMeals: Array<{activity: Activity, index: number}> = [];
+
   for (let i = 0; i < adjustedActivities.length; i++) {
-    // Skip departure and checkout - they're already positioned
     if (i === departureIndex || i === checkoutIndex) continue;
 
     const activity = adjustedActivities[i];
-    const activityTime = timeToMinutes(activity.time);
-
-    // All activities (meals, mosques, sightseeing) should be BEFORE checkout
-    // The departure activity already includes the airport transfer
-    if (activityTime < checkoutTime) {
-      beforeCheckout.push({activity, index: i});
+    if (isMealActivity(activity)) {
+      const mealType = (activity as any).mealType || 'unknown';
+      meals.push({activity, index: i, mealType});
     } else {
-      // Activity is scheduled after checkout but shouldn't be - move to before
-      console.log(`[Activity Order] Moving "${activity.title}" before checkout (was ${activity.time})`);
-      beforeCheckout.push({activity, index: i});
+      nonMeals.push({activity, index: i});
     }
   }
 
-  // Adjust timing for activities BEFORE checkout (start at 08:00)
-  let currentTime = 480; // 08:00
-  for (const {activity, index} of beforeCheckout) {
-    const newTime = minutesToTime(currentTime);
-    if (newTime !== activity.time) {
-      adjustedActivities[index] = {
-        ...activity,
-        time: newTime,
-      };
-      console.log(`[Activity Order] Adjusted "${activity.title}" to ${newTime}`);
+  // Set meal times with proper spacing
+  // Breakfast: 08:00, Lunch: 12:30, Dinner: dynamically based on checkout
+  const mealTimings: Record<string, number> = {
+    breakfast: 480,  // 08:00
+    lunch: 750,      // 12:30
+    dinner: Math.min(checkoutTime - 90, 1110), // 1.5 hours before checkout, max 18:30
+  };
+
+  // If checkout is before 14:00, skip dinner entirely (too early)
+  const skipDinner = checkoutTime <= 840; // 14:00
+
+  for (const {activity, index, mealType} of meals) {
+    if (mealType === 'dinner' && skipDinner) {
+      console.log(`[Activity Order] Skipping dinner on last day - checkout too early`);
+      continue;
     }
 
-    // Add appropriate time gap
-    if (activity.type === 'meal') {
-      currentTime += 60;
-    } else if (activity.type === 'mosque') {
-      currentTime += 30;
+    if (mealTimings[mealType]) {
+      const targetTime = mealTimings[mealType];
+      adjustedActivities[index] = {
+        ...activity,
+        time: minutesToTime(targetTime),
+      };
+      console.log(`[Activity Order] Set ${mealType} to ${minutesToTime(targetTime)}`);
+    }
+  }
+
+  // Now schedule non-meal activities to fit between meals
+  // Sort by original time to maintain relative order
+  nonMeals.sort((a, b) => timeToMinutes(a.activity.time) - timeToMinutes(b.activity.time));
+
+  // Define time slots where non-meal activities can go:
+  // - After breakfast (09:00 - 12:00)
+  // - After lunch (13:30 - checkout)
+  let currentTime = 540; // Start at 09:00 (after breakfast)
+
+  for (const {activity, index} of nonMeals) {
+    // Skip over meal times (don't schedule during meals)
+    // Breakfast: 08:00-09:00, Lunch: 12:30-13:30, Dinner: varies
+    if (currentTime >= 720 && currentTime < 810) { // 12:00-13:30 (lunch zone)
+      currentTime = 810; // Skip to 13:30
+    }
+
+    const dinnerTime = mealTimings.dinner;
+    if (!skipDinner && currentTime >= dinnerTime - 30 && currentTime < dinnerTime + 60) {
+      currentTime = dinnerTime + 60; // Skip past dinner
+    }
+
+    // Don't schedule after checkout
+    if (currentTime >= checkoutTime - 30) {
+      console.log(`[Activity Order] Not enough time for "${activity.title}" before checkout`);
+      // Set it to a reasonable time anyway (last available slot)
+      currentTime = checkoutTime - 90;
+    }
+
+    adjustedActivities[index] = {
+      ...activity,
+      time: minutesToTime(currentTime),
+    };
+    console.log(`[Activity Order] Adjusted "${activity.title}" to ${minutesToTime(currentTime)}`);
+
+    // Add appropriate gap
+    if (activity.type === 'mosque') {
+      currentTime += 45;
     } else {
       currentTime += 90;
     }
