@@ -1,7 +1,7 @@
 # 🌍 Planora - AI-Powered Travel Planning Web Application
 
 > **Final Year Project (FYP) - Computer Science**  
-> **Sunway University | 2024/2025**
+> **Sunway University | 2025**
 
 Planora is an intelligent travel planning web application that generates personalized, day-by-day itineraries using Google Gemini AI. With a strong focus on cultural inclusivity, Planora offers features like halal food filtering, prayer times integration, mosque recommendations, dietary preferences, and accessibility options to cater to diverse traveler needs.
 
