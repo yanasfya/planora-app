@@ -16,6 +16,7 @@ Planora is an intelligent travel planning web application that generates persona
 - Personalized day-by-day itineraries based on user preferences
 - Real-time activity recommendations with opening hours and pricing
 - Dynamic budget allocation across days and activities
+- 3-tier budget system (budget, mid-range, luxury)
 
 ### 🕌 Cultural Inclusivity Features
 - **Halal Food Filtering** - Automatically filters restaurants for halal options
@@ -29,14 +30,14 @@ Planora is an intelligent travel planning web application that generates persona
 - **Transportation Calculation** - Automatic route optimization and travel times
 - **Hotel Recommendations** - Integration with Booking.com API
 - **Weather Forecasting** - 5-day weather predictions for destinations
-- **Multi-Currency Support** - Real-time currency conversion for 10 currencies
+- **Multi-Currency Support** - Real-time currency conversion for 10 currencies (USD, EUR, GBP, JPY, IDR, MYR, THB, SGD, AUD, AED)
 
 ### 👤 User Features
-- **User Authentication** - Secure sign-in with Google OAuth (NextAuth.js v5)
+- **User Authentication** - Secure sign-in with Google OAuth  and email/password (NextAuth.js v5)
 - **Dashboard** - Manage saved itineraries and preferences
 - **Itinerary Editing** - Add, remove, or modify activities
 - **PDF Export** - Download itineraries for offline use
-- **Share Itineraries** - Public URLs for sharing trip plans
+- **Share Itineraries** - Share via WhatsApp, Facebook, Twitter
 
 ---
 
@@ -53,15 +54,15 @@ Planora is an intelligent travel planning web application that generates persona
 - **Next.js API Routes** - Serverless backend
 - **MongoDB** - NoSQL database for user data and itineraries
 - **NextAuth.js v5** - Authentication with Google OAuth
-- **Google Gemini AI** - Primary AI model for itinerary generation
+- **Google Gemini 2.5 Flash** - Primary AI model for itinerary generation
 - **Google Places API** - Venue information and recommendations
 - **Google Maps API** - Interactive maps and directions
+- **Google Directions API** - Transportation routing and travel times
 - **Google Geocoding API** - Location coordinate conversion
 - **OpenWeatherMap API** - Weather forecasting
 - **Booking.com API** - Hotel recommendations
 - **Aladhan API** - Islamic prayer times
 - **ExchangeRate-API** - Real-time currency conversion
-- **Unsplash API** - Destination imagery
 
 ### Deployment
 - **Vercel** - Hosting and continuous deployment
@@ -72,14 +73,15 @@ Planora is an intelligent travel planning web application that generates persona
 ## 🔑 Key Innovations
 
 ### 4-Stage Post-Processing Pipeline
+Planora uses a hybrid AI architecture combining LLM creativity with systematic validation:
 1. **Transportation Enrichment** - Calculates optimal routes using Google Directions API
 2. **Meal Planning** - Strategically places breakfast, lunch, and dinner based on activity timing
-3. **Mosque Integration** - Adds nearby mosques for Friday prayers and regular prayer times
+3. **Mosque Integration** - Adds nearby mosques Muslim travelers with proximity-based search
 4. **Activity Ordering** - Ensures logical flow with opening hours validation
 
 ### Hybrid AI Approach
-- **Primary:** Google Gemini Flash (gemini-1.5-flash-002) for fast generation
-- **Fallback:** Gemini Pro (gemini-1.5-pro-002) for complex requests
+- **Primary:** Google Gemini 2.5 Flash for creative itinerary generation
+- **4-stage validation pipeline** addresses constraint satisfaction gaps in standalone LLMs
 - Systematic validation of AI-generated content
 - Real-time data integration to ensure accuracy
 
