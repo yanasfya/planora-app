@@ -62,7 +62,6 @@ Planora is an intelligent travel planning web application that generates persona
 - **OpenWeatherMap API** - Weather forecasting
 - **Booking.com API** - Hotel recommendations
 - **Aladhan API** - Islamic prayer times
-- **ExchangeRate-API** - Real-time currency conversion
 
 ### Deployment
 - **Vercel** - Hosting and continuous deployment
