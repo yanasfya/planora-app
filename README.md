@@ -29,7 +29,7 @@ Planora is an intelligent travel planning web application that generates persona
 - **Transportation Calculation** - Automatic route optimization and travel times
 - **Hotel Recommendations** - Integration with Booking.com API
 - **Weather Forecasting** - 5-day weather predictions for destinations
-- **Multi-Currency Support** - Real-time currency conversion for 30+ currencies
+- **Multi-Currency Support** - Real-time currency conversion for 10 currencies
 
 ### 👤 User Features
 - **User Authentication** - Secure sign-in with Google OAuth (NextAuth.js v5)
