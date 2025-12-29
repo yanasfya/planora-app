@@ -21,6 +21,7 @@ const STATIC_RATES: Record<string, number> = {
   'KRW': 1320.0,
   'HKD': 7.83,
   'PHP': 56.50,
+  'AED': 3.67,
 };
 
 // Cache for exchange rates
@@ -141,6 +142,7 @@ export function getCurrencySymbol(currency: string): string {
     'KRW': '₩',
     'HKD': 'HK$',
     'PHP': '₱',
+    'AED': 'د.إ',
   };
 
   return symbols[currency] || '$';
