@@ -87,8 +87,6 @@ export const PrefsSchema = z.object({
   dietaryPreferences: DietaryPreferencesSchema,
   specialRequirements: z.string().optional(),
   numberOfTravelers: z.number().int().min(1).default(1),
-  numberOfAdults: z.number().int().min(1).default(1),
-  numberOfChildren: z.number().int().min(0).default(0),
 });
 
 export const ItinerarySchema = z.object({

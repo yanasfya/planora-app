@@ -217,8 +217,7 @@ function generateBookingUrl(
   checkInDate?: string,
   checkOutDate?: string,
   hotelIndex: number = 0,
-  adults: number = 2,
-  children: number = 0
+  guests: number = 2
 ): string {
   let checkIn = checkInDate;
   let checkOut = checkOutDate;
@@ -244,16 +243,15 @@ function generateBookingUrl(
   const minPrice = Math.floor(basePrice * variation.min);
   const maxPrice = Math.ceil(basePrice * variation.max);
 
-  // Calculate rooms needed (1 room per 2 adults, minimum 1)
-  const totalGuests = adults + children;
-  const numRooms = Math.max(1, Math.ceil(totalGuests / 2));
+  // Calculate rooms needed (1 room per 2 guests, minimum 1)
+  const numRooms = Math.max(1, Math.ceil(guests / 2));
 
   const params = new URLSearchParams({
     ss: `${hotelName}`,
     checkin: checkIn,
     checkout: checkOut,
-    group_adults: adults.toString(),
-    group_children: children.toString(),
+    group_adults: guests.toString(),
+    group_children: "0",
     no_rooms: numRooms.toString(),
     nflt: `price=USD-${minPrice}-${maxPrice}-1;class=3;class=4`,
   });
@@ -328,8 +326,7 @@ async function fetchRealHotels(
   budget: "low" | "medium" | "high",
   checkInDate?: string,
   checkOutDate?: string,
-  adults: number = 2,
-  children: number = 0
+  guests: number = 2
 ): Promise<Hotel[] | null> {
   if (!RAPIDAPI_KEY) {
     console.log("[Hotels API] No RapidAPI key configured, using fallback");
@@ -380,16 +377,14 @@ async function fetchRealHotels(
     const pricing = getCityPricing(city);
 
     // Calculate rooms needed (1 room per 2 guests, minimum 1)
-    const totalGuests = adults + children;
-    const numRooms = Math.max(1, Math.ceil(totalGuests / 2));
+    const numRooms = Math.max(1, Math.ceil(guests / 2));
 
     const hotelsUrl = new URL("https://booking-com.p.rapidapi.com/v1/hotels/search");
     hotelsUrl.searchParams.set("dest_id", destId);
     hotelsUrl.searchParams.set("dest_type", destType);
     hotelsUrl.searchParams.set("checkin_date", checkIn);
     hotelsUrl.searchParams.set("checkout_date", checkOut);
-    hotelsUrl.searchParams.set("adults_number", adults.toString());
-    hotelsUrl.searchParams.set("children_number", children.toString());
+    hotelsUrl.searchParams.set("adults_number", guests.toString());
     hotelsUrl.searchParams.set("room_number", numRooms.toString());
     hotelsUrl.searchParams.set("units", "metric");
     hotelsUrl.searchParams.set("locale", "en-gb");
@@ -463,7 +458,7 @@ async function fetchRealHotels(
         // Add check-in/check-out dates to the URL if not already present
         if (checkIn && checkOut && !bookingUrl.includes('checkin=')) {
           const separator = bookingUrl.includes('?') ? '&' : '?';
-          bookingUrl += `${separator}checkin=${checkIn}&checkout=${checkOut}&group_adults=${adults}&group_children=${children}&no_rooms=${numRooms}`;
+          bookingUrl += `${separator}checkin=${checkIn}&checkout=${checkOut}&group_adults=${guests}&group_children=0&no_rooms=${numRooms}`;
         }
       } else {
         // Fallback: construct URL using hotel_id with proper format
@@ -473,8 +468,8 @@ async function fetchRealHotels(
           ss: hotelName,
           checkin: checkIn || '',
           checkout: checkOut || '',
-          group_adults: adults.toString(),
-          group_children: children.toString(),
+          group_adults: guests.toString(),
+          group_children: '0',
           no_rooms: numRooms.toString(),
           dest_id: destId,
           dest_type: destType,
@@ -524,8 +519,7 @@ function generateSmartHotels(
   budget: "low" | "medium" | "high",
   checkInDate?: string,
   checkOutDate?: string,
-  adults: number = 2,
-  children: number = 0
+  guests: number = 2
 ): Hotel[] {
   const pricing = getCityPricing(city);
   const basePrice = pricing[budget];
@@ -550,7 +544,7 @@ function generateSmartHotels(
       image: getUnsplashImage(i),
       amenities: amenities.slice(0, 3),
       location: `${area}, ${city}`,
-      bookingUrl: generateBookingUrl(hotelName, city, budget, pricing, checkInDate, checkOutDate, i, adults, children),
+      bookingUrl: generateBookingUrl(hotelName, city, budget, pricing, checkInDate, checkOutDate, i, guests),
     });
   }
 
@@ -564,12 +558,10 @@ export async function GET(req: Request) {
     const budget = searchParams.get("budget") as "low" | "medium" | "high";
     const datesParam = searchParams.get("dates");
     const currencyParam = searchParams.get("currency");
-    const adultsParam = searchParams.get("adults");
-    const childrenParam = searchParams.get("children");
+    const guestsParam = searchParams.get("guests");
 
-    // Parse adults and children (default to 2 adults, 0 children)
-    const adults = Math.max(1, parseInt(adultsParam || "2", 10) || 2);
-    const children = Math.max(0, parseInt(childrenParam || "0", 10) || 0);
+    // Parse guests (default to 2 if not provided or invalid)
+    const guests = Math.max(1, parseInt(guestsParam || "2", 10) || 2);
 
     let checkInDate: string | undefined;
     let checkOutDate: string | undefined;
@@ -599,7 +591,7 @@ export async function GET(req: Request) {
 
     const city = extractCityName(destination);
 
-    const cacheKey = `${city.toLowerCase()}-${budget}-${checkInDate || "default"}-${checkOutDate || "default"}-${detectedCurrency}-${adults}-${children}`;
+    const cacheKey = `${city.toLowerCase()}-${budget}-${checkInDate || "default"}-${checkOutDate || "default"}-${detectedCurrency}-${guests}`;
     const cached = cache.get(cacheKey);
 
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
@@ -620,11 +612,11 @@ export async function GET(req: Request) {
       });
     }
 
-    let hotelsUSD = await fetchRealHotels(city, budget, checkInDate, checkOutDate, adults, children);
+    let hotelsUSD = await fetchRealHotels(city, budget, checkInDate, checkOutDate, guests);
     let dataSource = "BOOKING_COM_API";
 
     if (!hotelsUSD || hotelsUSD.length === 0) {
-      hotelsUSD = generateSmartHotels(city, budget, checkInDate, checkOutDate, adults, children);
+      hotelsUSD = generateSmartHotels(city, budget, checkInDate, checkOutDate, guests);
       dataSource = "SMART_RECOMMENDATIONS";
     }
 

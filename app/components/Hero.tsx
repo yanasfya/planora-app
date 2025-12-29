@@ -114,8 +114,6 @@ export default function Hero({ onGenerate, loading }: HeroProps) {
       budget,
       interests: selectedInterests,
       numberOfTravelers: 1,
-      numberOfAdults: 1,
-      numberOfChildren: 0,
     };
 
     onGenerate(prefs);

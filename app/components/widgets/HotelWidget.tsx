@@ -37,8 +37,6 @@ interface HotelWidgetProps {
   checkInDate?: string;
   checkOutDate?: string;
   guests?: number;
-  adults?: number;
-  children?: number;
   className?: string;
 }
 
@@ -48,13 +46,8 @@ export default function HotelWidget({
   checkInDate,
   checkOutDate,
   guests = 2,
-  adults,
-  children = 0,
   className = ""
 }: HotelWidgetProps) {
-  // Use adults prop if provided, otherwise fall back to guests (for backward compatibility)
-  const actualAdults = adults ?? guests;
-  const actualChildren = children;
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,8 +99,8 @@ export default function HotelWidget({
         // Add currency parameter
         url += `&currency=${activeCurrency}`;
 
-        // Add adults and children parameters
-        url += `&adults=${actualAdults}&children=${actualChildren}`;
+        // Add guests parameter
+        url += `&guests=${guests}`;
 
         const response = await fetch(url);
 
@@ -134,7 +127,7 @@ export default function HotelWidget({
     if (destination && budget) {
       fetchHotels();
     }
-  }, [destination, budget, checkInDate, checkOutDate, activeCurrency, actualAdults, actualChildren]);
+  }, [destination, budget, checkInDate, checkOutDate, activeCurrency, guests]);
 
   const nextHotel = () => {
     setCurrentIndex((prev) => (prev + 1) % hotels.length);
