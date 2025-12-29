@@ -492,6 +492,8 @@ export default function ItineraryPage({ params }: { params: { id: string } }) {
                   checkInDate={itinerary.prefs.startDate}
                   checkOutDate={itinerary.prefs.endDate}
                   guests={itinerary.prefs.numberOfTravelers || 2}
+                  adults={itinerary.prefs.numberOfAdults || itinerary.prefs.numberOfTravelers || 2}
+                  children={itinerary.prefs.numberOfChildren || 0}
                 />
               </div>
             </div>

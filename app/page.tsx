@@ -223,6 +223,8 @@ export default function Page() {
       dietaryPreferences,
       specialRequirements: specialRequirements.trim() || undefined,
       numberOfTravelers: totalTravelers,
+      numberOfAdults: data.adults,
+      numberOfChildren: data.children + data.infants,
     };
 
     handleGenerate(prefs);
